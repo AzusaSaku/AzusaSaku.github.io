@@ -6,6 +6,7 @@
     <title>首页 | 柯川</title>
     <meta name="description" content="个人主页、技术博客、清单、友链和关于我。" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="site.js" defer></script>
   </head>
   <body>
     <div class="door-effect" aria-hidden="true">
@@ -13,19 +14,7 @@
       <span></span>
     </div>
 
-    <header class="topbar" aria-label="站点导航">
-      <a class="mini-profile" href="index.html" aria-label="回到首页">
-        <span class="mini-avatar"><img class="mini-avatar" src="assets/avatar.jpg" alt="Mio 的头像" /></span>
-        <span class="mini-id">柯川</span>
-      </a>
-      <nav class="top-links" aria-label="主导航">
-        <a href="index.html">首页</a>
-        <a href="archive.html">归档</a>
-        <a href="lists.html">清单</a>
-        <a href="friends.html">友链</a>
-        <a href="about.html">关于我</a>
-      </nav>
-    </header>
+    <header class="topbar" aria-label="站点导航" data-site-header></header>
 
     <main>
       <section class="hero" id="home" aria-labelledby="hero-title">
@@ -36,29 +25,17 @@
           <span class="meteor meteor-d"></span>
         </div>
         <div class="hero-shade" aria-hidden="true"></div>
-        <h1 id="hero-title">一生一次的机会</h1>
+        <h1 id="hero-title">
+          <span>一段崎岖的旅行</span>
+          <span class="typewriter">一生一次的机会</span>
+        </h1>
         <a class="scroll-hint" href="#intro" aria-label="下滑查看本站介绍">
           <span></span>
         </a>
       </section>
 
       <section class="home-content" id="intro">
-        <aside class="github-card" aria-label="个人简介">
-          <div class="profile-avatar"><img class="profile-avatar" src="assets/avatar.jpg" alt="Mio 的头像" /></div>
-          <h2>柯川</h2>
-          <p class="handle">@AzusaSaku</p>
-          <p class="bio">这不够高难度，我还不满足。</p>
-          <dl class="profile-meta">
-            <div>
-              <dt>Location</dt>
-              <dd>北京</dd>
-            </div>
-            <div>
-              <dt>Focus</dt>
-              <dd>软件安全</dd>
-            </div>
-          </dl>
-        </aside>
+        <aside class="github-card" aria-label="个人简介" data-profile-card></aside>
 
         <article class="intro-copy">
           <p class="eyebrow">welcome</p>

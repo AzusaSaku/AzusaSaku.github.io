@@ -204,6 +204,9 @@ a {
 }
 
 .hero h1 {
+  display: grid;
+  justify-items: center;
+  gap: 0.16em;
   margin: 0;
   color: #fff;
   font-size: clamp(2.9rem, 8vw, 7.4rem);
@@ -211,6 +214,18 @@ a {
   letter-spacing: 0;
   text-align: center;
   text-shadow: 0 8px 34px rgba(38, 25, 54, 0.45);
+}
+
+.typewriter {
+  display: inline-block;
+  width: 0;
+  max-width: max-content;
+  overflow: hidden;
+  border-right: 0.08em solid currentColor;
+  white-space: nowrap;
+  animation:
+    typing-loop 5.8s steps(7, end) infinite,
+    caret-blink 0.72s step-end infinite;
 }
 
 .scroll-hint {
@@ -457,5 +472,33 @@ a {
   50% {
     opacity: 0.45;
     transform: translateY(14px);
+  }
+}
+
+@keyframes typing-loop {
+  0%,
+  12% {
+    width: 0;
+  }
+
+  38%,
+  62% {
+    width: 7em;
+  }
+
+  88%,
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    border-color: currentColor;
+  }
+
+  50% {
+    border-color: transparent;
   }
 }

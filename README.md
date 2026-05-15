@@ -1,7 +1,3 @@
-# Personal Homepage
-
-这是一个可直接用于 GitHub Pages 的静态个人主页。
-
 ## 结构
 
 - `index.html`
