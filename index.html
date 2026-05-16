@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>首页 | 柯川</title>
     <meta name="description" content="个人主页、技术博客、清单、友链和关于我。" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260516" />
+    <script src="site.js?v=20260516" defer></script>
   </head>
   <body>
     <div class="door-effect" aria-hidden="true">
@@ -13,19 +14,7 @@
       <span></span>
     </div>
 
-    <header class="topbar" aria-label="站点导航">
-      <a class="mini-profile" href="index.html" aria-label="回到首页">
-        <span class="mini-avatar"><img class="mini-avatar" src="assets/avatar.jpg" alt="Mio 的头像" /></span>
-        <span class="mini-id">柯川</span>
-      </a>
-      <nav class="top-links" aria-label="主导航">
-        <a href="index.html">首页</a>
-        <a href="archive.html">归档</a>
-        <a href="lists.html">清单</a>
-        <a href="friends.html">友链</a>
-        <a href="about.html">关于我</a>
-      </nav>
-    </header>
+    <header class="topbar" aria-label="站点导航" data-site-header></header>
 
     <main>
       <section class="hero" id="home" aria-labelledby="hero-title">
@@ -36,33 +25,20 @@
           <span class="meteor meteor-d"></span>
         </div>
         <div class="hero-shade" aria-hidden="true"></div>
-        <h1 id="hero-title">一生一次的机会</h1>
+        <h1 id="hero-title">
+          <span>一段崎岖的旅行</span>
+          <span class="typewriter">一生一次的机会</span>
+        </h1>
         <a class="scroll-hint" href="#intro" aria-label="下滑查看本站介绍">
           <span></span>
         </a>
       </section>
 
       <section class="home-content" id="intro">
-        <aside class="github-card" aria-label="个人简介">
-          <div class="profile-avatar"><img class="profile-avatar" src="assets/avatar.jpg" alt="Mio 的头像" /></div>
-          <h2>柯川</h2>
-          <p class="handle">@AzusaSaku</p>
-          <p class="bio">这不够高难度，我还不满足。</p>
-          <dl class="profile-meta">
-            <div>
-              <dt>Location</dt>
-              <dd>北京</dd>
-            </div>
-            <div>
-              <dt>Focus</dt>
-              <dd>软件安全</dd>
-            </div>
-          </dl>
-        </aside>
+        <aside class="github-card" aria-label="个人简介" data-profile-card></aside>
 
         <article class="intro-copy">
           <p class="eyebrow">welcome</p>
-          <h2>本站介绍</h2>
           <p>
             这是一个用来慢慢积累的个人主页。归档会放技术博客，清单会放我的爱好和长期想做的事，
             友链会放一些喜欢的站点，关于我会整理更正式的自我介绍。
@@ -71,8 +47,18 @@
             之后内容变多时，可以把每个部分拆得更细，比如技术文章按年份归档，清单音乐、游戏、
             书和乐器分类，关于我里加入学术经历、项目链接和其他主页。
           </p>
+          <hr>
+          <p style="color: #aaa; font-size: 0.9em;">
+            你说「我一直在等你先开口」<br>
+            你说「我在年轻时就梦见这一切了」<br>
+            你说「我已经原谅你了」<br>
+            你说「真是不甘心」<br>
+            你说「答应记住最美丽时候的我」<br>
+            你说「不想就过了这样的一生」
+          </p>
         </article>
       </section>
     </main>
+    <footer class="site-footer" data-site-footer></footer>
   </body>
 </html>
