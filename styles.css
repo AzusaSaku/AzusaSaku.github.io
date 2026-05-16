@@ -482,35 +482,30 @@ a {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: clamp(12px, 2vw, 26px);
   margin-top: 28px;
 }
 
 .section-tab {
-  min-height: 42px;
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  color: var(--muted);
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
   cursor: pointer;
   font: inherit;
   font-size: 0.92rem;
   font-weight: 800;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
 }
 
 .section-tab:hover,
 .section-tab:focus-visible,
 .section-tab.is-active {
-  border-color: rgba(232, 93, 134, 0.36);
-  background: #fff;
-  color: var(--rose-deep);
-  transform: translateY(-1px);
+  border-color: currentColor;
+  background: transparent;
+  color: var(--ink);
+  transform: none;
 }
 
 .posts-section {

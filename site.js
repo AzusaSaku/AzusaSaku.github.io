@@ -286,14 +286,20 @@ function renderSectionPage() {
 }
 
 function setOwnerModeFromUrl() {
-  const params = new URLSearchParams(window.location.search);
+  const queryParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const ownerMode = queryParams.get("owner") || hashParams.get("owner");
 
-  if (params.get("owner") === "1") {
+  if (ownerMode === "1") {
     localStorage.setItem(siteConfig.stats.ownerStorageKey, "1");
   }
 
-  if (params.get("owner") === "0") {
+  if (ownerMode === "0") {
     localStorage.removeItem(siteConfig.stats.ownerStorageKey);
+  }
+
+  if (ownerMode && window.history.replaceState) {
+    window.history.replaceState(null, document.title, window.location.pathname);
   }
 }
 
