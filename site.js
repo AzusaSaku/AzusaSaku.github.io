@@ -31,21 +31,6 @@ const siteConfig = {
       headline: "琴心剑魄今何在",
       background: "assets/cover.jpg",
       tabs: ["编程技术", "Rev & Pwn", "IoT安全", "AI相关"],
-      /*
-      posts: [
-        {
-          tab: "技术博客",
-          title: "可靠性与注意力机制阅读笔记",
-          date: "2026-05-15",
-          updated: "2026-05-15",
-          kind: "论文",
-          comments: 0,
-          image: "assets/cover.jpg",
-          href: "posts/reliability-aware-attention.html",
-          excerpt: "把近期阅读的可靠性、注意力机制和异常检测材料整理到一起，留下公式、实验设计和后续可以继续追的问题。",
-        },
-      ],
-      */
     },
     lists: {
       title: "清单",
@@ -54,12 +39,23 @@ const siteConfig = {
       tabs: ["设备", "随想"],
       posts: [
         {
+          tab: "设备",
+          title: "「神子 Miko」 Sugi Stargazer Miko Classic Pink",
+          source: "posts/Sugi_Miko.md",
+          href: "artical.html?post=posts/Sugi_Miko.md",
+          image: "assets/cover.jpg",
+          variant: "minimal",
+        },
+      ],
+      posts: [
+        {
           tab: "随想",
           title: "我的一个朋友",
           source: "posts/My_Friends_0.md",
           href: "artical.html?post=posts/My_Friends_0.md",
           image: "assets/cover.jpg",
           variant: "minimal",
+          style: "wenkai",
         },
       ],
     },
@@ -329,6 +325,9 @@ function createPostCard(post, index) {
 
   if (index % 2 === 1) {
     card.classList.add("post-card-reverse");
+    card.classList.add("post-card-right-image");
+  } else {
+    card.classList.add("post-card-left-image");
   }
 
   card.append(imageWrap, content);
@@ -707,6 +706,9 @@ async function renderArticlePage() {
   const dates = await fetchPostDates(source).catch(() => ({ published: post.date, updated: post.updated }));
   const article = createElement("article", "article-shell");
   article.classList.add(getPostClassName(source));
+  if (post.style) {
+    article.classList.add(`article-style-${post.style}`);
+  }
   const header = createElement("header", "article-header");
   const meta = createElement(
     "p",

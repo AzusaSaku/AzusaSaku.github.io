@@ -514,14 +514,14 @@ a {
 
 .post-list {
   display: grid;
-  gap: 30px;
+  gap: 24px;
   width: min(1180px, calc(100% - 48px));
   margin: 0 auto;
 }
 
 .post-card {
   display: grid;
-  min-height: 330px;
+  min-height: 270px;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   overflow: hidden;
   border-radius: 8px;
@@ -543,12 +543,12 @@ a {
 .post-content {
   display: grid;
   align-content: center;
-  padding: clamp(32px, 5vw, 62px);
+  padding: clamp(26px, 4vw, 48px);
 }
 
 .post-content h3 {
-  margin: 0 0 16px;
-  font-size: clamp(1.55rem, 3vw, 2.15rem);
+  margin: 0 0 12px;
+  font-size: clamp(1.42rem, 2.6vw, 1.95rem);
   line-height: 1.18;
   letter-spacing: 0;
 }
@@ -556,12 +556,12 @@ a {
 .post-meta,
 .post-excerpt {
   color: #777;
-  line-height: 1.85;
+  line-height: 1.72;
 }
 
 .post-meta {
-  margin: 0 0 18px;
-  font-size: 0.98rem;
+  margin: 0 0 14px;
+  font-size: 0.94rem;
 }
 
 .post-excerpt {
@@ -631,18 +631,18 @@ a {
   font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 }
 
-.article-post-my-friends-0 .article-header h1,
-.article-post-my-friends-0 .article-content {
+.article-style-wenkai .article-header h1,
+.article-style-wenkai .article-content {
   font-family: "LXGW WenKai", "霞鹜文楷", "Noto Serif SC", "Songti SC", serif;
 }
 
-.article-post-my-friends-0 .article-content {
+.article-style-wenkai .article-content {
   color: #3f3a44;
   font-size: 1.12rem;
   line-height: 2.12;
 }
 
-.article-post-my-friends-0 .article-content p {
+.article-style-wenkai .article-content p {
   margin-bottom: 1.28em;
 }
 
