@@ -20,6 +20,11 @@ const siteConfig = {
     counterEndpoint: "https://bsz.saop.cc/api",
     ownerStorageKey: "azusasaku-site-owner",
   },
+  github: {
+    owner: "AzusaSaku",
+    repo: "AzusaSaku.github.io",
+    branch: "main",
+  },
   sections: {
     archive: {
       title: "归档",
@@ -47,6 +52,16 @@ const siteConfig = {
       headline: "琴心剑魄今何在",
       background: "assets/cover.jpg",
       tabs: ["设备", "随想"],
+      posts: [
+        {
+          tab: "随想",
+          title: "我的一个朋友",
+          source: "posts/My_Friends_0.md",
+          href: "artical.html?post=posts/My_Friends_0.md",
+          image: "assets/cover.jpg",
+          variant: "minimal",
+        },
+      ],
     },
     friends: {
       title: "友链",
@@ -178,6 +193,112 @@ function createSectionProfile() {
   return profile;
 }
 
+const postDateCache = new Map();
+
+function getAllPosts() {
+  return Object.values(siteConfig.sections || {}).flatMap((section) => section.posts || []);
+}
+
+function getPostBySource(source) {
+  return getAllPosts().find((post) => post.source === source || encodeURI(post.source) === source);
+}
+
+function getPostClassName(source) {
+  return `article-post-${source
+    .split("/")
+    .pop()
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "待发布";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(value));
+}
+
+function getLastCommitPage(linkHeader) {
+  if (!linkHeader) {
+    return null;
+  }
+
+  const match = linkHeader.match(/[?&]page=(\d+)>;\s*rel="last"/);
+
+  return match ? Number(match[1]) : null;
+}
+
+async function fetchPostDates(source) {
+  if (!source) {
+    return { published: null, updated: null };
+  }
+
+  if (postDateCache.has(source)) {
+    return postDateCache.get(source);
+  }
+
+  const repo = siteConfig.github;
+  const params = new URLSearchParams({
+    path: source,
+    per_page: "1",
+    sha: repo.branch,
+  });
+  const latestResponse = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/commits?${params}`);
+
+  if (!latestResponse.ok) {
+    throw new Error("Unable to load GitHub commit dates");
+  }
+
+  const latestCommits = await latestResponse.json();
+  const latest = latestCommits[0]?.commit?.committer?.date || null;
+  const lastPage = getLastCommitPage(latestResponse.headers.get("Link"));
+  let oldest = latest;
+
+  if (lastPage && lastPage > 1) {
+    params.set("page", String(lastPage));
+    const oldestResponse = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/commits?${params}`);
+
+    if (oldestResponse.ok) {
+      const oldestCommits = await oldestResponse.json();
+      oldest = oldestCommits[0]?.commit?.committer?.date || latest;
+    }
+  }
+
+  const dates = {
+    published: oldest,
+    updated: latest,
+  };
+  postDateCache.set(source, dates);
+
+  return dates;
+}
+
+function hydratePostDates(post, card) {
+  const published = card.querySelector("[data-post-published]");
+  const updated = card.querySelector("[data-post-updated]");
+
+  if (!published || !updated) {
+    return;
+  }
+
+  fetchPostDates(post.source)
+    .then((dates) => {
+      published.textContent = formatDate(dates.published);
+      updated.textContent = formatDate(dates.updated);
+    })
+    .catch(() => {
+      published.textContent = post.date || "待发布";
+      updated.textContent = post.updated || "待发布";
+    });
+}
+
 function createPostCard(post, index) {
   const card = createElement("a", "post-card");
   card.href = post.href;
@@ -189,21 +310,29 @@ function createPostCard(post, index) {
   imageWrap.append(image);
 
   const content = createElement("article", "post-content");
-  content.append(
-    createElement("h3", "", post.title),
-    createElement(
-      "p",
-      "post-meta",
-      `发表于 ${post.date} | 更新于 ${post.updated} | ${post.kind} | ${post.comments} 条评论`,
-    ),
-    createElement("p", "post-excerpt", post.excerpt),
-  );
+  const meta = createElement("p", "post-meta");
+
+  if (post.variant === "minimal") {
+    meta.append(
+      document.createTextNode("发表于 "),
+      createElement("span", "", post.date || "读取中"),
+      document.createTextNode(" | 更新于 "),
+      createElement("span", "", post.updated || "读取中"),
+    );
+    meta.querySelectorAll("span")[0].dataset.postPublished = "";
+    meta.querySelectorAll("span")[1].dataset.postUpdated = "";
+    content.append(createElement("h3", "", post.title), meta);
+  } else {
+    meta.textContent = `发表于 ${post.date || "待发布"} | 更新于 ${post.updated || "待发布"} | ${post.kind || "文章"} | ${post.comments || 0} 条评论`;
+    content.append(createElement("h3", "", post.title), meta, createElement("p", "post-excerpt", post.excerpt || ""));
+  }
 
   if (index % 2 === 1) {
     card.classList.add("post-card-reverse");
   }
 
   card.append(imageWrap, content);
+  hydratePostDates(post, card);
 
   return card;
 }
@@ -211,9 +340,8 @@ function createPostCard(post, index) {
 function renderPosts(posts, activeTab, list) {
   const allPosts = posts || [];
   const visiblePosts = allPosts.filter((post) => post.tab === activeTab);
-  const fallbackPosts = visiblePosts.length ? visiblePosts : allPosts;
 
-  list.replaceChildren(...fallbackPosts.map((post, index) => createPostCard(post, index)));
+  list.replaceChildren(...visiblePosts.map((post, index) => createPostCard(post, index)));
 }
 
 function renderSectionPage() {
@@ -387,7 +515,8 @@ async function getPageText(href) {
 }
 
 async function renderWordCount(target) {
-  const pages = [...new Set(siteConfig.nav.map((item) => item.href))];
+  const postSources = getAllPosts().map((post) => post.source).filter(Boolean);
+  const pages = [...new Set([...siteConfig.nav.map((item) => item.href), ...postSources])];
   const pageText = await Promise.all(pages.map((href) => getPageText(href).catch(() => "")));
   const visibleText = document.body ? document.body.innerText : "";
   const total = countWords([getConfiguredSiteText(), visibleText, ...pageText].join(" "));
@@ -471,9 +600,138 @@ function renderSiteFooter() {
   });
 }
 
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderMarkdownFallback(markdown) {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const html = [];
+  let paragraph = [];
+
+  const flushParagraph = () => {
+    if (!paragraph.length) {
+      return;
+    }
+
+    html.push(`<p>${paragraph.join("<br>")}</p>`);
+    paragraph = [];
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushParagraph();
+      return;
+    }
+
+    if (/^\*\*\*$/.test(trimmed)) {
+      flushParagraph();
+      html.push("<hr>");
+      return;
+    }
+
+    const heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
+
+    if (heading) {
+      flushParagraph();
+      html.push(`<h${heading[1].length}>${escapeHtml(heading[2])}</h${heading[1].length}>`);
+      return;
+    }
+
+    paragraph.push(escapeHtml(trimmed));
+  });
+
+  flushParagraph();
+
+  return html.join("");
+}
+
+function getMarkdownTitle(markdown, fallback) {
+  const match = markdown.match(/^#\s+(.+)$/m);
+
+  return match ? match[1].trim() : fallback;
+}
+
+async function fetchArticleMarkdown(source) {
+  const repo = siteConfig.github;
+  const candidates = [
+    source,
+    encodeURI(source),
+    `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${repo.branch}/${encodeURI(source)}`,
+  ];
+
+  for (const candidate of candidates) {
+    const markdown = await fetch(candidate, { cache: "no-store" })
+      .then((response) => (response.ok ? response.text() : ""))
+      .catch(() => "");
+
+    if (markdown) {
+      return markdown;
+    }
+  }
+
+  return "";
+}
+
+async function renderArticlePage() {
+  const page = document.querySelector("[data-article-page]");
+
+  if (!page) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const source = params.get("post");
+  const post = getPostBySource(source);
+
+  if (!source || !post) {
+    page.replaceChildren(createElement("p", "article-error", "没有找到这篇文章。"));
+    return;
+  }
+
+  const markdown = await fetchArticleMarkdown(source);
+
+  if (!markdown) {
+    page.replaceChildren(createElement("p", "article-error", "文章内容读取失败，请确认 md 文件已经上传到 posts 文件夹。"));
+    return;
+  }
+
+  const title = getMarkdownTitle(markdown, post.title);
+  const bodyMarkdown = markdown.replace(/^#\s+.+(?:\r?\n)+/, "");
+  const dates = await fetchPostDates(source).catch(() => ({ published: post.date, updated: post.updated }));
+  const article = createElement("article", "article-shell");
+  article.classList.add(getPostClassName(source));
+  const header = createElement("header", "article-header");
+  const meta = createElement(
+    "p",
+    "post-meta",
+    `发表于 ${formatDate(dates.published)} | 更新于 ${formatDate(dates.updated)}`,
+  );
+  const body = createElement("div", "article-content");
+
+  document.title = `${title} | ${siteConfig.owner.name}`;
+  header.append(createElement("h1", "", title), meta);
+
+  if (window.marked) {
+    body.innerHTML = window.marked.parse(bodyMarkdown);
+  } else {
+    body.innerHTML = renderMarkdownFallback(bodyMarkdown);
+  }
+
+  article.append(header, body);
+  page.replaceChildren(article);
+}
+
 setOwnerModeFromUrl();
 renderDocumentTitle();
 renderHeader();
 renderProfileCard();
 renderSectionPage();
 renderSiteFooter();
+renderArticlePage();
