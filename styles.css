@@ -27,7 +27,7 @@ body {
     linear-gradient(180deg, #fffaf8 0%, #fff6fb 48%, #f8fffc 100%);
   color: var(--ink);
   font-family:
-    Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    "Noto Sans SC", "Microsoft YaHei", sans-serif;
 }
 
 a {
@@ -348,6 +348,49 @@ a {
   font-size: 1.06rem;
 }
 
+.home-posts {
+  display: grid;
+  gap: 18px;
+  margin: 30px 0 28px;
+}
+
+.home-post-link {
+  display: grid;
+  grid-template-columns: 122px minmax(0, 1fr);
+  gap: 46px;
+  align-items: baseline;
+  width: fit-content;
+  max-width: 100%;
+  color: #575360;
+  font-family: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: clamp(1rem, 2.2vw, 1.24rem);
+  line-height: 1.5;
+}
+
+.home-post-link:hover .home-post-title,
+.home-post-link:focus-visible .home-post-title {
+  color: var(--rose-deep);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.home-post-date {
+  color: #6f6a76;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.home-post-title {
+  min-width: 0;
+  color: #514c58;
+}
+
+.home-post-loading {
+  margin: 0;
+  color: var(--muted);
+  font-family: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+}
+
 .inner-page {
   min-height: 100svh;
 }
@@ -628,7 +671,48 @@ a {
   padding: 0.14em 0.34em;
   border-radius: 4px;
   background: rgba(48, 43, 62, 0.08);
-  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+}
+
+.article-content pre {
+  overflow-x: auto;
+  margin: 1.4em 0;
+  padding: 18px 20px;
+  border: 1px solid rgba(48, 43, 62, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.article-content pre code {
+  display: block;
+  padding: 0;
+  background: transparent;
+  line-height: 1.75;
+}
+
+.article-style-tech .article-header h1,
+.article-style-tech .article-content {
+  font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+.article-style-tech .article-content {
+  color: #4c4754;
+  font-size: 1.06rem;
+  line-height: 1.95;
+}
+
+.article-style-tech .article-content h2,
+.article-style-tech .article-content h3 {
+  font-weight: 800;
+}
+
+.article-style-tech .article-content code,
+.article-style-tech .article-content pre code {
+  font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+}
+
+.article-style-tech .article-content pre {
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .article-style-wenkai .article-header h1,
@@ -703,6 +787,13 @@ a {
   .home-content,
   .simple-page {
     width: min(100% - 32px, 900px);
+  }
+
+  .home-post-link {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 20px;
+    width: 100%;
+    font-size: 0.98rem;
   }
 
   .section-hero {

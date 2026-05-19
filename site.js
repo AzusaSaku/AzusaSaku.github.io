@@ -31,6 +31,19 @@ const siteConfig = {
       headline: "琴心剑魄今何在",
       background: "assets/cover.jpg",
       tabs: ["编程技术", "Rev & Pwn", "IoT安全", "AI相关"],
+      posts: [
+        {
+          tab: "Rev & Pwn",
+          title: "XR 软件逆向分析流程记录",
+          source: "posts/XR_reverse.md",
+          href: "artical.html?post=posts/XR_reverse.md",
+          image: "assets/cover.jpg",
+          variant: "minimal",
+          date: "2026-05-19",
+          updated: "2026-05-19",
+          style: "tech",
+        },
+      ],
     },
     lists: {
       title: "清单",
@@ -45,9 +58,9 @@ const siteConfig = {
           href: "artical.html?post=posts/Sugi_Miko.md",
           image: "assets/cover.jpg",
           variant: "minimal",
+          date: "2026-05-18",
+          updated: "2026-05-18",
         },
-      ],
-      posts: [
         {
           tab: "随想",
           title: "我的一个朋友",
@@ -55,6 +68,8 @@ const siteConfig = {
           href: "artical.html?post=posts/My_Friends_0.md",
           image: "assets/cover.jpg",
           variant: "minimal",
+          date: "2026-05-18",
+          updated: "2026-05-18",
           style: "wenkai",
         },
       ],
@@ -221,6 +236,24 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatArchiveDate(value) {
+  if (!value) {
+    return "读取中";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function getLastCommitPage(linkHeader) {
   if (!linkHeader) {
     return null;
@@ -286,13 +319,57 @@ function hydratePostDates(post, card) {
 
   fetchPostDates(post.source)
     .then((dates) => {
-      published.textContent = formatDate(dates.published);
-      updated.textContent = formatDate(dates.updated);
+      published.textContent = formatDate(dates.published || post.date);
+      updated.textContent = formatDate(dates.updated || post.updated || post.date);
     })
     .catch(() => {
       published.textContent = post.date || "待发布";
       updated.textContent = post.updated || "待发布";
     });
+}
+
+async function renderHomePostLinks() {
+  const list = document.querySelector("[data-home-posts]");
+
+  if (!list) {
+    return;
+  }
+
+  const posts = getAllPosts();
+
+  if (!posts.length) {
+    list.remove();
+    return;
+  }
+
+  list.replaceChildren(createElement("p", "home-post-loading", "文章读取中"));
+
+  const datedPosts = await Promise.all(
+    posts.map((post) =>
+      fetchPostDates(post.source)
+        .then((dates) => ({ post, updated: dates.updated || post.updated || post.date || null }))
+        .catch(() => ({ post, updated: post.updated || post.date || null })),
+    ),
+  );
+
+  datedPosts.sort((a, b) => new Date(b.updated || 0) - new Date(a.updated || 0));
+
+  const rows = datedPosts.map(({ post, updated }) => {
+    const link = createElement("a", "home-post-link");
+    link.href = post.href;
+
+    const date = createElement("time", "home-post-date", formatArchiveDate(updated));
+
+    if (updated) {
+      date.dateTime = new Date(updated).toISOString();
+    }
+
+    link.append(date, createElement("span", "home-post-title", post.title));
+
+    return link;
+  });
+
+  list.replaceChildren(...rows);
 }
 
 function createPostCard(post, index) {
@@ -713,7 +790,7 @@ async function renderArticlePage() {
   const meta = createElement(
     "p",
     "post-meta",
-    `发表于 ${formatDate(dates.published)} | 更新于 ${formatDate(dates.updated)}`,
+    `发表于 ${formatDate(dates.published || post.date)} | 更新于 ${formatDate(dates.updated || post.updated || post.date)}`,
   );
   const body = createElement("div", "article-content");
 
@@ -734,6 +811,7 @@ setOwnerModeFromUrl();
 renderDocumentTitle();
 renderHeader();
 renderProfileCard();
+renderHomePostLinks();
 renderSectionPage();
 renderSiteFooter();
 renderArticlePage();
