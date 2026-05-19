@@ -734,6 +734,55 @@ function getMarkdownTitle(markdown, fallback) {
   return match ? match[1].trim() : fallback;
 }
 
+function slugifyHeading(text, index) {
+  return `heading-${index}-${text
+    .trim()
+    .toLowerCase()
+    .replace(/<[^>]*>/g, "")
+    .replace(/[`"'“”‘’]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\u4e00-\u9fa5-]+/g, "")
+    .replace(/^-|-$/g, "")}`;
+}
+
+function highlightArticleCode(body) {
+  if (!window.hljs) {
+    return;
+  }
+
+  body.querySelectorAll("pre code").forEach((block) => {
+    window.hljs.highlightElement(block);
+  });
+}
+
+function createArticleToc(body) {
+  const headings = [...body.querySelectorAll("h2, h3")];
+
+  if (!headings.length) {
+    return null;
+  }
+
+  const toc = createElement("nav", "article-toc");
+  toc.setAttribute("aria-label", "文章目录");
+
+  const list = createElement("div", "article-toc-list");
+
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      heading.id = slugifyHeading(heading.textContent || "section", index);
+    }
+
+    const link = createElement("a", `article-toc-link article-toc-${heading.tagName.toLowerCase()}`);
+    link.href = `#${heading.id}`;
+    link.append(createElement("span", "article-toc-text", heading.textContent || ""));
+    list.append(link);
+  });
+
+  toc.append(list);
+
+  return toc;
+}
+
 async function fetchArticleMarkdown(source) {
   const repo = siteConfig.github;
   const candidates = [
@@ -803,8 +852,18 @@ async function renderArticlePage() {
     body.innerHTML = renderMarkdownFallback(bodyMarkdown);
   }
 
+  highlightArticleCode(body);
+  const toc = createArticleToc(body);
+
   article.append(header, body);
-  page.replaceChildren(article);
+  const layout = createElement("div", "article-layout");
+  layout.append(article);
+
+  if (toc) {
+    layout.append(toc);
+  }
+
+  page.replaceChildren(layout);
 }
 
 setOwnerModeFromUrl();

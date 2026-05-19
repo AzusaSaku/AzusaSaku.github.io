@@ -353,7 +353,7 @@ void __fastcall Analytics_RecordGrab(__int64 this, __int64 interactable, MethodI
 
 这种函数就值得继续看上报 URL、字段名和触发频率。  
 
-## 第九步：关注 XR 隐私和权限数据
+## 隐私和权限数据
 
 XR 软件比普通手游更容易碰到敏感数据。Android Manifest 里关注：  
 
