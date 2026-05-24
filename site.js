@@ -20,6 +20,10 @@ const siteConfig = {
     counterEndpoint: "https://bsz.saop.cc/api",
     ownerStorageKey: "azusasaku-site-owner",
   },
+  cursorEffect: {
+    enabled: true,
+    mascotImage: "assets/neko.png",
+  },
   github: {
     owner: "AzusaSaku",
     repo: "AzusaSaku.github.io",
@@ -29,7 +33,7 @@ const siteConfig = {
     archive: {
       title: "归档",
       headline: "琴心剑魄今何在",
-      background: "assets/cover.jpg",
+      background: "assets/cover_archive.png",
       tabs: ["编程技术", "Rev & Pwn", "IoT安全", "AI相关"],
       posts: [
         {
@@ -48,18 +52,19 @@ const siteConfig = {
     lists: {
       title: "清单",
       headline: "琴心剑魄今何在",
-      background: "assets/cover.jpg",
-      tabs: ["设备", "随想"],
+      background: "assets/cover_lists.png",
+      tabs: ["设备", "推荐", "随想"],
       posts: [
         {
           tab: "设备",
-          title: "「神子 Miko」 Sugi Stargazer Miko Classic Pink",
+          title: "「神子 Miko」Sugi Stargazer",
           source: "posts/Sugi_Miko.md",
           href: "artical.html?post=posts/Sugi_Miko.md",
           image: "assets/cover.jpg",
           variant: "minimal",
           date: "2026-05-18",
           updated: "2026-05-18",
+          style: "tech",
         },
         {
           tab: "随想",
@@ -76,15 +81,15 @@ const siteConfig = {
     },
     friends: {
       title: "友链",
-      headline: "",
-      background: "assets/cover.jpg",
-      tabs: [],
+      headline: "是我欲陪你流浪",
+      background: "assets/cover_friends.png",
+      tabs: ["友链"],
     },
     about: {
       title: "关于我",
-      headline: "",
-      background: "assets/cover.jpg",
-      tabs: [],
+      headline: "莲花去国一千年",
+      background: "assets/cover_about.png",
+      tabs: ["生涯", "时间轴"],
     },
   },
 };
@@ -345,14 +350,23 @@ async function renderHomePostLinks() {
   list.replaceChildren(createElement("p", "home-post-loading", "文章读取中"));
 
   const datedPosts = await Promise.all(
-    posts.map((post) =>
+    posts.map((post, index) =>
       fetchPostDates(post.source)
-        .then((dates) => ({ post, updated: dates.updated || post.updated || post.date || null }))
-        .catch(() => ({ post, updated: post.updated || post.date || null })),
+        .then((dates) => ({ post, index, updated: dates.updated || post.updated || post.date || null }))
+        .catch(() => ({ post, index, updated: post.updated || post.date || null })),
     ),
   );
 
-  datedPosts.sort((a, b) => new Date(b.updated || 0) - new Date(a.updated || 0));
+  datedPosts.sort((a, b) => {
+    const bTime = b.updated ? new Date(b.updated).getTime() : -Infinity;
+    const aTime = a.updated ? new Date(a.updated).getTime() : -Infinity;
+
+    if (bTime !== aTime) {
+      return bTime - aTime;
+    }
+
+    return a.index - b.index;
+  });
 
   const rows = datedPosts.map(({ post, updated }) => {
     const link = createElement("a", "home-post-link");
@@ -866,6 +880,74 @@ async function renderArticlePage() {
   page.replaceChildren(layout);
 }
 
+function renderCursorEffect() {
+  if (!siteConfig.cursorEffect?.enabled) {
+    return;
+  }
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+
+  if (reduceMotion || coarsePointer) {
+    return;
+  }
+
+  const mascot = createElement("div", "cursor-mascot");
+  mascot.setAttribute("aria-hidden", "true");
+
+  if (siteConfig.cursorEffect.mascotImage) {
+    const image = document.createElement("img");
+    image.src = siteConfig.cursorEffect.mascotImage;
+    image.alt = "";
+    mascot.append(image);
+  } else {
+    mascot.classList.add("cursor-mascot-placeholder");
+  }
+
+  document.body.append(mascot);
+
+  let lastSparkleTime = 0;
+  let mascotX = window.innerWidth / 2;
+  let mascotY = window.innerHeight / 2;
+  let targetX = mascotX;
+  let targetY = mascotY;
+
+  const moveMascot = () => {
+    mascotX += (targetX - mascotX) * 0.42;
+    mascotY += (targetY - mascotY) * 0.42;
+    mascot.style.transform = `translate3d(${mascotX}px, ${mascotY}px, 0)`;
+    requestAnimationFrame(moveMascot);
+  };
+
+  moveMascot();
+
+  document.addEventListener("mousemove", (event) => {
+    targetX = event.clientX + 8;
+    targetY = event.clientY + 8;
+
+    const now = performance.now();
+
+    if (now - lastSparkleTime < 34) {
+      return;
+    }
+
+    lastSparkleTime = now;
+
+    const sparkle = createElement("span", "cursor-sparkle");
+    const offsetX = (Math.random() - 0.5) * 18;
+    const offsetY = (Math.random() - 0.5) * 18;
+    const size = 5 + Math.random() * 8;
+
+    sparkle.style.left = `${event.clientX + offsetX}px`;
+    sparkle.style.top = `${event.clientY + offsetY}px`;
+    sparkle.style.width = `${size}px`;
+    sparkle.style.animationDuration = `${560 + Math.random() * 320}ms`;
+    document.body.append(sparkle);
+
+    sparkle.addEventListener("animationend", () => sparkle.remove(), { once: true });
+  });
+}
+
 setOwnerModeFromUrl();
 renderDocumentTitle();
 renderHeader();
@@ -874,3 +956,4 @@ renderHomePostLinks();
 renderSectionPage();
 renderSiteFooter();
 renderArticlePage();
+renderCursorEffect();
