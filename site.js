@@ -769,6 +769,18 @@ function highlightArticleCode(body) {
   });
 }
 
+function constrainArticleTables(body) {
+  body.querySelectorAll("table").forEach((table) => {
+    if (table.parentElement?.classList.contains("article-table-wrap")) {
+      return;
+    }
+
+    const wrapper = createElement("div", "article-table-wrap");
+    table.before(wrapper);
+    wrapper.append(table);
+  });
+}
+
 function createArticleToc(body) {
   const headings = [...body.querySelectorAll("h2, h3")];
 
@@ -867,6 +879,7 @@ async function renderArticlePage() {
   }
 
   highlightArticleCode(body);
+  constrainArticleTables(body);
   const toc = createArticleToc(body);
 
   article.append(header, body);

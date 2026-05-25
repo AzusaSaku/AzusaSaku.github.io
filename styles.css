@@ -622,16 +622,19 @@ a {
   width: min(920px, calc(100% - 40px));
   margin: 0 auto;
   padding: clamp(128px, 15vw, 172px) 0 clamp(72px, 10vw, 120px);
+  overflow-x: hidden;
 }
 
 .article-layout {
   display: block;
+  min-width: 0;
 }
 
 .article-shell {
   display: grid;
   gap: clamp(36px, 6vw, 58px);
   min-width: 0;
+  max-width: 100%;
 }
 
 .article-header h1 {
@@ -639,12 +642,16 @@ a {
   font-size: clamp(2.35rem, 6vw, 4.8rem);
   line-height: 1.08;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .article-content {
   color: #4c4754;
   font-size: 1.08rem;
   line-height: 2;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .article-content h2,
@@ -657,6 +664,7 @@ a {
 
 .article-content p {
   margin: 0 0 1.15em;
+  max-width: 100%;
 }
 
 .article-content a {
@@ -685,6 +693,16 @@ a {
   padding-left: 18px;
   border-left: 3px solid rgba(232, 93, 134, 0.48);
   color: var(--muted);
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.article-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.8em auto;
+  border-radius: 8px;
 }
 
 .article-content code {
@@ -692,9 +710,15 @@ a {
   border-radius: 4px;
   background: rgba(48, 43, 62, 0.08);
   font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+  white-space: break-spaces;
+  overflow-wrap: anywhere;
 }
 
 .article-content pre {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   overflow-x: auto;
   margin: 1.4em 0;
   padding: 18px 20px;
@@ -705,10 +729,40 @@ a {
 
 .article-content pre code {
   display: block;
+  min-width: max-content;
   padding: 0;
   color: inherit;
   background: transparent;
   line-height: 1.75;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.article-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.6em 0;
+}
+
+.article-content table {
+  width: max-content;
+  max-width: none;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.article-content th,
+.article-content td {
+  padding: 10px 12px;
+  border: 1px solid rgba(48, 43, 62, 0.12);
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-content iframe,
+.article-content video {
+  max-width: 100%;
 }
 
 .article-content pre code.hljs {
