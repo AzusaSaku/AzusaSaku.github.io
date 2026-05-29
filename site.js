@@ -56,6 +56,17 @@ const siteConfig = {
       tabs: ["设备", "推荐", "随想"],
       posts: [
         {
+          tab: "推荐",
+          title: "我最推荐的十张唱片",
+          source: "posts/Album_recommendations.md",
+          href: "artical.html?post=posts/Album_recommendations.md",
+          image: "assets/cover.jpg",
+          variant: "minimal",
+          date: "2026-05-18",
+          updated: "2026-05-18",
+          style: "tech",
+        },
+        {
           tab: "设备",
           title: "「神子 Miko」Sugi Stargazer",
           source: "posts/Sugi_Miko.md",
