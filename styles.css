@@ -705,6 +705,10 @@ a {
   border-radius: 8px;
 }
 
+.article-content img[src*="assets/Album_recommendations/"] {
+  max-width: min(100%, 420px);
+}
+
 .article-content code {
   padding: 0.14em 0.34em;
   border-radius: 4px;
